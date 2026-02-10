@@ -168,12 +168,3 @@ Analysis of the training logs for AZT1D revealed that validation loss was occasi
 
 The model showed high predictive accuracy in "dysglycemic regions" (hypoglycemia and hyperglycemia), which are critical for clinical safety in T1D management. Similarly, in the ETTm1 context, the stable temperature predictions provide a reliable basis for identifying potential "extreme load capacity" issues, as highlighted in the ETT documentation.
 
-### Strategic Recommendations
-
-1. **Cohort Expansion:** Expand the AZT1D dataset to include 100 patients (as planned in the source study) to improve model robustness against diverse metabolic phenotypes.
-2. **Long-Sequence Forecasting:** Investigate longer prediction horizons (H > 1) for ETTm1. As suggested by the ETDataset metadata, long-term forecasting is essential for industrial planning and preventing equipment depreciation.
-3. **Refined Loss Functions:** For the AZT1D environment, implement custom loss functions specifically tuned for dysglycemic regions. As noted in the source paper (Study [8]), utilizing a loss function tuned via a genetic algorithm can further reduce RMSE and MAE during critical glycemic excursions.
-
----
-
-In conclusion, the developed LSTM models are ready for secondary operational validation, offering a high-accuracy foundation for both real-time clinical decision support and industrial equipment monitoring.
