@@ -120,19 +120,19 @@ The R² values exceeding 0.98 for both datasets indicate the model successfully 
 
 **Training History**
 
-![ETTm1 Training History](ettm1_training_history.png)
+![ETTm1 Training History](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/1.png)
 
 The training history for ETTm1 demonstrates rapid convergence within the first few epochs, with both training and validation losses stabilizing around 0.011-0.012 (scaled units). The close alignment between training and validation curves indicates minimal overfitting, reflecting the seasonal and stationary nature of industrial transformer data.
 
 **Prediction Accuracy**
 
-![ETTm1 Predictions vs Actual](ettm1_predictions_vs_actual.png)
+![ETTm1 Predictions vs Actual](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/2.png)
 
 The predictions vs actual plot shows excellent tracking of oil temperature fluctuations across the entire test set. The model successfully captures both short-term variations and longer-term seasonal trends in transformer thermal behavior.
 
 **Error Distribution**
 
-![ETTm1 Error Distribution](ettm1_error_distribution.png)
+![ETTm1 Error Distribution](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/3.png)
 
 The error distribution is tightly centered around zero with a near-Gaussian shape, indicating unbiased predictions. The majority of prediction errors fall within ±1°C, demonstrating the model's precision in temperature forecasting for critical infrastructure monitoring.
 
@@ -140,19 +140,19 @@ The error distribution is tightly centered around zero with a near-Gaussian shap
 
 **Training History**
 
-![AZT1D Training History](azt1d_training_history.png)
+![AZT1D Training History](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/1.png)
 
 The AZT1D training history shows steady convergence over approximately 35 epochs. Notable is the occasional lower validation loss compared to training loss in early epochs, suggesting effective generalization across different patient metabolic profiles. The model benefits from early stopping and learning rate scheduling to prevent overfitting to individual patient patterns.
 
 **Prediction Accuracy**
 
-![AZT1D Predictions vs Actual](azt1d_predictions_vs_actual.png)
+![AZT1D Predictions vs Actual](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/2.png)
 
 The predictions vs actual plot reveals the model's ability to track highly volatile glucose dynamics across multiple patients. The LSTM successfully captures both gradual glucose trends and rapid excursions associated with meals and insulin administration, maintaining accuracy even during critical dysglycemic episodes.
 
 **Error Distribution**
 
-![AZT1D Error Distribution](azt1d_error_distribution.png)
+![AZT1D Error Distribution](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/3.png)
 
 The error distribution for glucose predictions demonstrates a symmetric, near-zero-centered pattern. The majority of errors fall within ±10 mg/dL, which is clinically acceptable for continuous glucose monitoring applications. The tight distribution confirms the model's reliability for real-time diabetes management support.
 
