@@ -116,21 +116,30 @@ The Transformer model employs a `TransformerEncoderLayer` with 8 attention heads
 
 **Architectural specifications differed by dataset complexity:**
 
+<<<<<<< HEAD
 **AZT1D Transformer:**
 - Leaner configuration with `d_model=64` and `dim_feedforward=128`
 - Higher dropout rate (0.5) due to higher noise in physiological data
+=======
+![ETTm1 Training History](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/1.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 **ETT Transformer:**
 - Larger `d_model=128` to capture complex industrial load patterns
 
 The Transformer processes the entire window in parallel, extracting the final prediction from the last time-step's representation in the encoder stack.
 
+<<<<<<< HEAD
 ## 7. Experimental Design
+=======
+![ETTm1 Predictions vs Actual](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/2.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 Standardized experimental configurations were maintained to ensure reproducibility. Training utilized the AdamW optimizer and the Mean Squared Error (MSE) loss function.
 
 ### Table 2: Experiment Configuration Summary
 
+<<<<<<< HEAD
 | Parameter | Configuration Value |
 |-----------|-------------------|
 | **Window (T) / Horizon (H)** | 96 / 1 |
@@ -142,6 +151,9 @@ Standardized experimental configurations were maintained to ensure reproducibili
 | **Batch Size** | 64 |
 | **Early Stopping Patience** | 15 |
 | **Evaluation Metrics** | MSE, MAE, R² |
+=======
+![ETTm1 Error Distribution](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/ETD/img/3.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 ## 8. Results and Analysis
 
@@ -149,10 +161,14 @@ Empirical results across both datasets reveal a consistent performance advantage
 
 ### AZT1D Performance (Physiological Data)
 
+<<<<<<< HEAD
 **LSTM:**
 - MSE: 21.3975
 - MAE: 2.8467
 - R²: 0.9885
+=======
+![AZT1D Training History](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/1.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 **Transformer:**
 - MSE: 36.3333
@@ -161,10 +177,14 @@ Empirical results across both datasets reveal a consistent performance advantage
 
 ### ETTm1 Performance (Industrial Data)
 
+<<<<<<< HEAD
 **LSTM:**
 - MSE: 0.1101
 - MAE: 0.2238
 - R²: 0.9864
+=======
+![AZT1D Predictions vs Actual](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/2.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 **Transformer:**
 - MSE: 0.1501
@@ -173,7 +193,11 @@ Empirical results across both datasets reveal a consistent performance advantage
 
 ### Methodological Synthesis
 
+<<<<<<< HEAD
 The superior performance of the LSTM can be attributed to the **sequential inductive bias** of recurrent architectures. For a short-step horizon (H=1), the primary predictive signal is the local temporal continuity of the signal. 
+=======
+![AZT1D Error Distribution](https://github.com/hknl5/LSTM-Based-Forecasting-for-Medical-and-Industrial-Time-Series-Datasets/blob/main/AZTD/img/3.png)
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
 
 LSTMs are inherently biased toward this sequential order, whereas Transformers use global self-attention to weight the entire window. In the H=1 setup, the global receptive field provides marginal utility, and the lack of an inherent sequential bias in Transformers—coupled with higher regularization requirements (0.5 dropout in AZT1D)—leads to higher error rates. 
 
@@ -181,8 +205,21 @@ Early stopping occurred at:
 - **Epoch 33** for the AZT1D LSTM
 - **Epoch 36** for the ETT Transformer
 
+<<<<<<< HEAD
 This indicates sufficient convergence.
 
 ---
 
 Chao
+=======
+The achievement of high R² values confirms the robustness of the 2-layer LSTM for short-term forecasting. The model demonstrated resilience against the biological noise of AZT1D and the multi-seasonal complexity of ETTm1.
+
+### Observation Analysis
+
+Analysis of the training logs for AZT1D revealed that validation loss was occasionally lower than training loss during the early epochs. This suggest that the model generalized effectively to the validation subject distribution. For ETTm1, the model achieved rapid convergence, likely due to the highly seasonal and less stochastic nature of industrial transformer metrics compared to human metabolism.
+
+### Efficacy in Critical Regions
+
+The model showed high predictive accuracy in "dysglycemic regions" (hypoglycemia and hyperglycemia), which are critical for clinical safety in T1D management. Similarly, in the ETTm1 context, the stable temperature predictions provide a reliable basis for identifying potential "extreme load capacity" issues, as highlighted in the ETT documentation.
+
+>>>>>>> 49b9f5cba8570cc65f9ea9e147569d3d34492446
