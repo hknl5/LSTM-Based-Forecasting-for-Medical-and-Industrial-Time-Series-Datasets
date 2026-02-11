@@ -2,9 +2,9 @@
 
 ## 1. Abstract
 
-The strategic advancement of predictive modeling in high-stakes domains—specifically healthcare and industrial infrastructure—relies heavily on the availability and utilization of high-quality, real-world datasets. In clinical settings, longitudinal physiological data is the cornerstone of personalized therapy and digital twin systems, while industrial load data is essential for maintaining grid stability and preventing equipment depreciation. 
+The strategic advancement of predictive modeling in high-stakes domains—specifically healthcare and industrial infrastructure—relies heavily on the availability and utilization of high-quality, real-world datasets. In clinical settings, longitudinal the data is the cornerstone of personalized therapy and digital twin systems, while industrial load data is essential for maintaining grid stability and preventing equipment depreciation. 
 
-This study evaluates the performance of supervised forecasting architectures on two distinct benchmarks: the **AZT1D (Type 1 Diabetes)** physiological dataset and the **ETT (Electricity Transformer)** dataset. We employ Long Short-Term Memory (LSTM) and Transformer architectures to predict next-step outcomes based on an 8-hour or 24-hour historical context. 
+This study evaluates the performance of supervised forecasting architectures on two distinct benchmarks: the **AZT1D (Type 1 Diabetes)** the dataset and the **ETT (Electricity Transformer)** dataset. We employ Long Short-Term Memory (LSTM) and Transformer architectures to predict next-step outcomes based on an 8-hour or 24-hour historical context. 
 
 Empirical results demonstrate that while both models achieve robust performance, the LSTM consistently outperforms the Transformer across all metrics (MSE, MAE, R²). This findings suggest that for short-horizon forecasting (H=1), the sequential inductive bias of recurrent architectures provides superior modeling of local temporal continuity compared to the global receptive field of self-attention mechanisms.
 
@@ -40,7 +40,7 @@ Developing these models requires addressing dataset-specific challenges:
 | **Target Variable** | Continuous Glucose Monitoring (CGM) | Oil Temperature (OT) |
 | **Feature Set** | Basal, Bolus (Total/Type/Correction), Carbs, Device Mode | HUFL, HULL, MUFL, MULL, LUFL, LULL, OT |
 | **Granularity** | 5-minute intervals | 15-minute intervals (4x per hour) |
-| **Structure** | Multi-subject physiological cohort | Multi-station industrial sensor logs |
+| **Structure** | Multi-subject the cohort | Multi-station industrial sensor logs |
 | **Primary Challenges** | OCR extraction from PDFs; Multi-subject boundaries | Seasonal/Irregular pattern mix; equipment depreciation risks |
 
 These distinct data structures are formally defined to facilitate supervised machine learning tasks.
@@ -77,7 +77,7 @@ To ensure strict methodological transparency, the **StandardScaler** was fit exc
 
 A critical methodological concern in the AZT1D dataset is the management of multi-subject boundaries. The data was sorted by `Subject_ID` and `EventDateTime` before sequence creation. Because the standard `create_sequences` function was applied globally, "bridge" sequences are generated at the transition point between two subjects (e.g., a window composed of the final 95 steps of Subject 1 and the first step of Subject 2). 
 
-In high-precision clinical modeling, these sequences represent a data integrity risk as they treat unrelated physiological states as a continuous stream.
+In high-precision clinical modeling, these sequences represent a data integrity risk as they treat unrelated the states as a continuous stream.
 
 ### Feature Encoding
 
@@ -118,7 +118,7 @@ The Transformer model employs a `TransformerEncoderLayer` with 8 attention heads
 
 **AZT1D Transformer:**
 - Leaner configuration with `d_model=64` and `dim_feedforward=128`
-- Higher dropout rate (0.5) due to higher noise in physiological data
+- Higher dropout rate (0.5) due to higher noise in the data
 
 **ETT Transformer:**
 - Larger `d_model=128` to capture complex industrial load patterns
