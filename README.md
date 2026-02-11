@@ -1,179 +1,188 @@
-# Comparative Technical Report: LSTM-Based Forecasting for Medical and Industrial Time-Series Datasets
+# Comparative Analysis of Deep Learning Architectures for Time-Series Forecasting: AZT1D and Electricity Transformer Datasets
 
-## 1. Dataset and Its Nature
+## 1. Abstract
 
-The evaluation of Long Short-Term Memory (LSTM) networks across high-stakes domains is a strategic necessity for validating architectural generalizability. In this report, we analyze the performance of a unified LSTM framework across two disparate environments: the AZT1D dataset (healthcare/physiological) and the ETDataset (ETTm1) (industrial/critical infrastructure). These datasets represent distinct challenges; while medical data is characterized by high intra-subject volatility and non-linear biological responses, industrial data typically follows stationary operational cycles and seasonal trends.
+The strategic advancement of predictive modeling in high-stakes domains—specifically healthcare and industrial infrastructure—relies heavily on the availability and utilization of high-quality, real-world datasets. In clinical settings, longitudinal physiological data is the cornerstone of personalized therapy and digital twin systems, while industrial load data is essential for maintaining grid stability and preventing equipment depreciation. 
 
-The AZT1D dataset is a real-world repository comprising data from 25 subjects over a 6–8 week period (averaging 26 days of continuous monitoring). It is defined by 5-minute granularity for Continuous Glucose Monitoring (CGM) and includes granular bolus insulin features—such as total dose and specific correction amounts—extracted from Tandem t:slim X2 insulin pumps. Conversely, the ETDataset (ETTm1) provides a 2-year industrial log of electricity transformers recorded at 15-minute intervals. The primary objective for ETTm1 is predicting "Oil Temperature" (OT), a critical proxy for transformer health and load capacity.
+This study evaluates the performance of supervised forecasting architectures on two distinct benchmarks: the **AZT1D (Type 1 Diabetes)** physiological dataset and the **ETT (Electricity Transformer)** dataset. We employ Long Short-Term Memory (LSTM) and Transformer architectures to predict next-step outcomes based on an 8-hour or 24-hour historical context. 
 
-### Dataset Comparative Specifications
+Empirical results demonstrate that while both models achieve robust performance, the LSTM consistently outperforms the Transformer across all metrics (MSE, MAE, R²). This findings suggest that for short-horizon forecasting (H=1), the sequential inductive bias of recurrent architectures provides superior modeling of local temporal continuity compared to the global receptive field of self-attention mechanisms.
 
-| Dimension | AZT1D (Healthcare) | ETTm1 (Industrial) |
-|-----------|-------------------|-------------------|
-| Time Granularity | 5 Minutes | 15 Minutes |
-| Target Variable | CGM (mg/dL) | Oil Temperature (OT) |
-| Key Features | CGM, Basal, Bolus, Carbs, DeviceMode | HUFL, HULL, MUFL, MULL, LUFL, LULL |
-| Metadata | Subject_ID, BolusType, DeviceMode | Recorded Date |
-| Duration | 6–8 weeks per patient | 2 Years |
+## 2. Datasets and Challenges (AZT1D, ETT/ETDataset)
 
-The multi-subject nature of AZT1D introduces significant personal variability, as metabolic signatures differ drastically between individuals. Modeling this requires respecting subject boundaries to account for idiosyncratic responses to insulin and carbohydrates. In contrast, the ETTm1 data is derived from stationary transformer stations where fluctuations are governed by electricity usage patterns, holidays, and weather-driven seasonality rather than biological variability. These structural differences necessitate rigorous data integrity protocols to ensure the model captures underlying temporal dependencies without falling victim to data leakage.
+Dataset diversity is a fundamental requirement for assessing the generalizability and robustness of time-series architectures. Models must be tested against varying temporal structures, from the highly stochastic metabolic fluctuations in human physiology to the rhythmic but irregular load patterns of mechanical systems.
 
-## 2. Preprocessing and Data Integrity
+### AZT1D Dataset
 
-The foundation of a high-fidelity predictive model rests on its data integrity protocols, specifically the prevention of data leakage. In time-series forecasting, leakage occurs when information from the future is inadvertently used to train the model, or when training statistics are informed by the validation or test sets.
+The **AZT1D dataset** represents a landmark resource in computational medicine, featuring a 25-individual cohort of patients with Type 1 Diabetes (T1D). Collected over a 6–8 week duration, it captures naturalistic diabetes management through Continuous Glucose Monitoring (CGM) and automated insulin delivery (AID) systems. Unlike simulated datasets, AZT1D includes granular details such as:
 
-### Sorting and Alignment Strategy
+- Bolus types (standard, correction, or automatic)
+- Specific device modes (e.g., sleep or exercise)
 
-Chronological and logical alignment was achieved through targeted sorting and interpolation:
+These provide critical context for glycemic excursions.
 
-* **AZT1D:** Records were sorted by Subject_ID and then by EventDateTime. To resolve the frequency mismatch between hourly basal rates and 5-minute CGM readings, basal values were repeated for each 5-minute interval. Carbohydrate and bolus events were zero-filled for intervals without recorded events.
-* **ETTm1:** Data was sorted strictly by the date timestamp to maintain the 15-minute interval sequence over the 2-year duration.
+### ETT Dataset
 
-### Scaling and Feature Engineering
+The **ETT (Electricity Transformer Dataset)** serves as a benchmark for long-sequence forecasting in industrial contexts. It comprises load and Oil Temperature (OT) measurements from transformers over a two-year period. While ETT exhibits strong seasonal trends, it is frequently disrupted by irregular patterns and extreme load events, making accurate forecasting essential for proactive system management and waste reduction.
 
-To prevent leakage, the StandardScaler was fit only on the training set (the first 70% of the indices). The resulting parameters were then applied to transform the validation and test sets. For the AZT1D dataset, categorical BolusType data was parsed using regular expressions to extract numeric insulin percentages and durations, subsequently encoded into binary flags (e.g., is_extended, is_automatic, has_correction) to transform qualitative event logs into quantitative features.
+### Dataset-Specific Challenges
 
-### Integrity Measures
+Developing these models requires addressing dataset-specific challenges:
 
-Integrity was further maintained by:
+- **For AZT1D**: A primary hurdle involves the multi-modal nature of data storage; while CGM and bolus logs are typically CSV-based, basal rates and device modes often require Optical Character Recognition (OCR) extraction from Tandem pump PDF reports.
 
-* **Subject Boundaries:** Sequence construction logic for AZT1D ensured that input windows did not span across different Subject_ID entries, preventing the model from learning transitions between unrelated patients.
-* **Feature Exclusion:** Non-predictive identifiers and timestamps (e.g., Subject_ID, EventDateTime, date) were excluded from the feature tensors to ensure the model relied solely on temporal and physiological/industrial signals.
+- **For ETT**: The challenge lies in capturing the interplay between local continuity and long-term seasonal cycles.
 
-## 3. Sequence Construction for LSTM
+### Table 1: Dataset Comparison
 
-Temporal modeling utilizes windowing to map historical observations to a future target. This sequence length (T) represents the "look-back" window, determining the model's temporal memory and its ability to identify recurring patterns.
+| Feature | AZT1D | ETT / ETDataset (m1) |
+|---------|-------|---------------------|
+| **Target Variable** | Continuous Glucose Monitoring (CGM) | Oil Temperature (OT) |
+| **Feature Set** | Basal, Bolus (Total/Type/Correction), Carbs, Device Mode | HUFL, HULL, MUFL, MULL, LUFL, LULL, OT |
+| **Granularity** | 5-minute intervals | 15-minute intervals (4x per hour) |
+| **Structure** | Multi-subject physiological cohort | Multi-station industrial sensor logs |
+| **Primary Challenges** | OCR extraction from PDFs; Multi-subject boundaries | Seasonal/Irregular pattern mix; equipment depreciation risks |
 
-### Windowing Parameters
+These distinct data structures are formally defined to facilitate supervised machine learning tasks.
 
-The study utilized the following standardized parameters:
+## 3. Problem Formulation
 
-* **Window Length (T):** 96 steps.
-* **Prediction Horizon (H):** 1 step.
-* **Input Tensor Shape (X):** N × 96 × F (where F is the number of features).
-* **Target Tensor Shape (y):** N × 1.
+Time-series forecasting is formulated here as a supervised learning task where a model learns a mapping from a fixed historical window to a single-step future target. In clinical and industrial operations, this proactive modeling allows for early intervention, such as preventing hypoglycemia or managing transformer overheating.
 
-### Sequence Creation Logic
+The mathematical framework utilizes a **sliding window approach** with a context size (T=96) and a forecast horizon (H=1):
 
-The create_sequences function was implemented using a sliding window approach:
+- **For AZT1D**: 96 steps represent 8 hours of history used to predict CGM at t+1
+- **For ETTm1**: The same window represents 24 hours of data
 
-* Iterate from index 0 through N - T.
-* For each step i, slice the feature matrix from i to i+T to form X.
-* Assign the target value at index i+T to y.
-* Store results as multi-dimensional arrays, subsequently converted to PyTorch tensors.
+The primary target variables are:
+- Continuous Glucose Monitoring (CGM)
+- Oil Temperature (OT)
 
-### Analysis of Window Selection
+Although the raw AZT1D logs contain a `delta_CGM` feature, it was ignored in favor of predicting absolute CGM values to ensure a consistent forecasting objective across datasets.
 
-The 96-step window length has significant domain-specific implications. In AZT1D, 96 steps represent 8 hours, a window optimized to capture full insulin-on-board cycles and postprandial glucose transitions. In ETTm1, 96 steps represent 24 hours, enabling the model to internalize a complete daily cycle of power load and thermal fluctuations. This alignment allows the architecture to capture both circadian biological rhythms and daily industrial operational cycles.
+## 4. Preprocessing and Leakage Prevention
 
-## 4. LSTM Training Setup
+Rigorous preprocessing is essential to maintain data integrity and prevent temporal leakage, which occurs when information from the validation or test sets "leaks" into the training phase.
 
-The LSTM architecture was selected for its efficacy in processing non-linear time-series and managing the vanishing gradient problem common in long sequences.
+### Chronological Splitting Strategy
 
-### Architecture Specification
+We adopted a chronological splitting strategy:
+- **70%** for training
+- **15%** for validation
+- **15%** for testing
 
-A standardized architecture was deployed for both use cases:
+To ensure strict methodological transparency, the **StandardScaler** was fit exclusively on the training portion (e.g., indices 0 to 214793 for AZT1D). The derived parameters were then applied to scale the validation and test sets.
 
-* **Layers:** 2-layer LSTM with 128 hidden units.
-* **Output:** A fully connected linear layer for single-step regression.
-* **Regularization:** A dropout rate of 0.2 was applied to recurrent layers.
+### Multi-Subject Boundary Management
 
-### Training Protocols and Stability
+A critical methodological concern in the AZT1D dataset is the management of multi-subject boundaries. The data was sorted by `Subject_ID` and `EventDateTime` before sequence creation. Because the standard `create_sequences` function was applied globally, "bridge" sequences are generated at the transition point between two subjects (e.g., a window composed of the final 95 steps of Subject 1 and the first step of Subject 2). 
 
-Training was conducted with a chronological split of 70% Train, 15% Val, and 15% Test. To ensure training stability and prevent exploding gradients—a common issue in deep recurrent networks—Gradient Norm Clipping was implemented with a max_norm of 1.0. A Batch Size of 64 was utilized to balance computational efficiency with the smoothing of stochastic gradient updates.
+In high-precision clinical modeling, these sequences represent a data integrity risk as they treat unrelated physiological states as a continuous stream.
 
-* **Optimizer:** AdamW (Weight decay: 1e-5).
-* **Scheduler:** ReduceLROnPlateau (factor: 0.5, patience: 5) to dynamically refine the learning rate.
-* **Early Stopping:** Patience of 15 epochs based on validation loss to prevent overfitting.
+### Feature Encoding
 
-## 5. Techniques Used
+- Categorical features such as `DeviceMode` and `BolusType` were encoded into binary flags (e.g., `is_extended`, `is_sleep`) or numeric representations
+- For AZT1D, hourly basal rates were forward-filled to align with the 5-minute CGM readings
 
-Baseline LSTM performance was augmented through domain-specific feature selection and strategic regularization.
+## 5. Sequence Construction
 
-* **AZT1D Feature Engineering:** The model utilized 22 features, including the encoded bolus flags, basal rates, and Time Features (hour, day of week, month) to capture temporal metabolic patterns. Notably, delta_CGM and Readings (CGM/BGM) were excluded to prevent the model from relying on pre-calculated derivatives.
-* **ETTm1 Feature Selection:** While time features were extracted during preprocessing, the final training feature set was restricted to 7 features (HUFL, HULL, MUFL, MULL, LUFL, LULL, and OT). This decision focused the model strictly on the operational power load metrics and the target temperature variable.
-* **Regularization:** In addition to dropout, L2 regularization via weight decay (1e-5) was enforced within the AdamW optimizer to constrain model complexity over the maximum 100-epoch training limit.
+Sliding window algorithms transform raw tabular data into 3D tensors suitable for deep learning. This process generates:
+- An input tensor **X** with shape `[n_sequences, T, D]`
+- A target vector **y** with shape `[n_sequences, 1]`
 
-## 6. Results
+The input dimension **D** is dataset-dependent:
 
-Quantitative validation demonstrates that the LSTM architecture achieves high predictive fidelity in both physiological and industrial contexts. The following metrics are reported in Original Units (mg/dL for glucose and Celsius for oil temperature), though the model optimized for Scaled Units during training.
+- **AZT1D (D=22)**: Encoded features include glucose, carbs, bolus metrics, device modes, and time features
+- **ETTm1 (D=7)**: Includes six load features and the target oil temperature
 
-### Quantitative Performance Metrics
+These sequences enable the models to learn the temporal dependencies inherent in the data.
 
-| Dataset | MSE | RMSE | MAE | R² |
-|---------|-----|------|-----|-----|
-| AZT1D (Glucose) | 21.3975 | 4.6257 | 2.8467 | 0.9885 |
-| ETTm1 (Oil Temp) | 0.1101 | 0.3318 | 0.2238 | 0.9864 |
+## 6. Models
 
-### Baseline Comparison
+This analysis evaluates the theoretical and empirical trade-offs between Recurrent Neural Networks (RNNs) and Self-Attention mechanisms.
 
-To contextualize the LSTM's efficacy, results were compared against a "Naive Approach" (predicting y_{t+1} = y_t).
+### LSTM Architecture
 
-* **AZT1D:** The LSTM's MSE (21.3975) represents a significant improvement over the Naive MSE of 41.8435.
-* **ETTm1:** The LSTM's MSE (0.1101) outperformed the Naive MSE of 0.1984.
+The Long Short-Term Memory (LSTM) architecture utilized two hidden layers with 128 units each. The model leverages its internal gating mechanism to maintain a cell state across the T=96 window. 
 
-The R² values exceeding 0.98 for both datasets indicate the model successfully explains nearly all the variance in the target variables, demonstrating a strong fit for both volatile biological data and smooth industrial trends.
+**Key specifications:**
+- Two hidden layers with 128 units each
+- Dropout rate: 0.2
+- Final prediction produced by mapping the hidden state from the terminal time-step of the second layer to the output dimension via a linear fully connected layer
 
-### Visualizations
+### Transformer Architecture
 
-#### ETTm1 (Industrial Dataset) Results
+The Transformer model employs a `TransformerEncoderLayer` with 8 attention heads. Positional encoding is added to the input projection to preserve temporal order. 
 
-**Training History**
+**Architectural specifications differed by dataset complexity:**
 
-![ETTm1 Training History](ettm1_training_history.png)
+**AZT1D Transformer:**
+- Leaner configuration with `d_model=64` and `dim_feedforward=128`
+- Higher dropout rate (0.5) due to higher noise in physiological data
 
-The training history for ETTm1 demonstrates rapid convergence within the first few epochs, with both training and validation losses stabilizing around 0.011-0.012 (scaled units). The close alignment between training and validation curves indicates minimal overfitting, reflecting the seasonal and stationary nature of industrial transformer data.
+**ETT Transformer:**
+- Larger `d_model=128` to capture complex industrial load patterns
 
-**Prediction Accuracy**
+The Transformer processes the entire window in parallel, extracting the final prediction from the last time-step's representation in the encoder stack.
 
-![ETTm1 Predictions vs Actual](ettm1_predictions_vs_actual.png)
+## 7. Experimental Design
 
-The predictions vs actual plot shows excellent tracking of oil temperature fluctuations across the entire test set. The model successfully captures both short-term variations and longer-term seasonal trends in transformer thermal behavior.
+Standardized experimental configurations were maintained to ensure reproducibility. Training utilized the AdamW optimizer and the Mean Squared Error (MSE) loss function.
 
-**Error Distribution**
+### Table 2: Experiment Configuration Summary
 
-![ETTm1 Error Distribution](ettm1_error_distribution.png)
+| Parameter | Configuration Value |
+|-----------|-------------------|
+| **Window (T) / Horizon (H)** | 96 / 1 |
+| **Data Splits (Tr/V/Te)** | 70% / 15% / 15% |
+| **Scaling Strategy** | StandardScaler (Fit on Training Only) |
+| **Optimizer / Learning Rate** | AdamW / 0.001 |
+| **Weight Decay** | 1e-5 |
+| **Gradient Clipping** | max_norm=1.0 |
+| **Batch Size** | 64 |
+| **Early Stopping Patience** | 15 |
+| **Evaluation Metrics** | MSE, MAE, R² |
 
-The error distribution is tightly centered around zero with a near-Gaussian shape, indicating unbiased predictions. The majority of prediction errors fall within ±1°C, demonstrating the model's precision in temperature forecasting for critical infrastructure monitoring.
+## 8. Results and Analysis
 
-#### AZT1D (Healthcare Dataset) Results
+Empirical results across both datasets reveal a consistent performance advantage for the LSTM over the Transformer.
 
-**Training History**
+### AZT1D Performance (Physiological Data)
 
-![AZT1D Training History](azt1d_training_history.png)
+**LSTM:**
+- MSE: 21.3975
+- MAE: 2.8467
+- R²: 0.9885
 
-The AZT1D training history shows steady convergence over approximately 35 epochs. Notable is the occasional lower validation loss compared to training loss in early epochs, suggesting effective generalization across different patient metabolic profiles. The model benefits from early stopping and learning rate scheduling to prevent overfitting to individual patient patterns.
+**Transformer:**
+- MSE: 36.3333
+- MAE: 4.0278
+- R²: 0.9804
 
-**Prediction Accuracy**
+### ETTm1 Performance (Industrial Data)
 
-![AZT1D Predictions vs Actual](azt1d_predictions_vs_actual.png)
+**LSTM:**
+- MSE: 0.1101
+- MAE: 0.2238
+- R²: 0.9864
 
-The predictions vs actual plot reveals the model's ability to track highly volatile glucose dynamics across multiple patients. The LSTM successfully captures both gradual glucose trends and rapid excursions associated with meals and insulin administration, maintaining accuracy even during critical dysglycemic episodes.
+**Transformer:**
+- MSE: 0.1501
+- MAE: 0.2796
+- R²: 0.9814
 
-**Error Distribution**
+### Methodological Synthesis
 
-![AZT1D Error Distribution](azt1d_error_distribution.png)
+The superior performance of the LSTM can be attributed to the **sequential inductive bias** of recurrent architectures. For a short-step horizon (H=1), the primary predictive signal is the local temporal continuity of the signal. 
 
-The error distribution for glucose predictions demonstrates a symmetric, near-zero-centered pattern. The majority of errors fall within ±10 mg/dL, which is clinically acceptable for continuous glucose monitoring applications. The tight distribution confirms the model's reliability for real-time diabetes management support.
+LSTMs are inherently biased toward this sequential order, whereas Transformers use global self-attention to weight the entire window. In the H=1 setup, the global receptive field provides marginal utility, and the lack of an inherent sequential bias in Transformers—coupled with higher regularization requirements (0.5 dropout in AZT1D)—leads to higher error rates. 
 
-## 7. Discussion and Next Steps
+Early stopping occurred at:
+- **Epoch 33** for the AZT1D LSTM
+- **Epoch 36** for the ETT Transformer
 
-The achievement of high R² values confirms the robustness of the 2-layer LSTM for short-term forecasting. The model demonstrated resilience against the biological noise of AZT1D and the multi-seasonal complexity of ETTm1.
-
-### Observation Analysis
-
-Analysis of the training logs for AZT1D revealed that validation loss was occasionally lower than training loss during the early epochs. This suggest that the model generalized effectively to the validation subject distribution. For ETTm1, the model achieved rapid convergence, likely due to the highly seasonal and less stochastic nature of industrial transformer metrics compared to human metabolism.
-
-### Efficacy in Critical Regions
-
-The model showed high predictive accuracy in "dysglycemic regions" (hypoglycemia and hyperglycemia), which are critical for clinical safety in T1D management. Similarly, in the ETTm1 context, the stable temperature predictions provide a reliable basis for identifying potential "extreme load capacity" issues, as highlighted in the ETT documentation.
-
-### Strategic Recommendations
-
-1. **Cohort Expansion:** Expand the AZT1D dataset to include 100 patients (as planned in the source study) to improve model robustness against diverse metabolic phenotypes.
-2. **Long-Sequence Forecasting:** Investigate longer prediction horizons (H > 1) for ETTm1. As suggested by the ETDataset metadata, long-term forecasting is essential for industrial planning and preventing equipment depreciation.
-3. **Refined Loss Functions:** For the AZT1D environment, implement custom loss functions specifically tuned for dysglycemic regions. As noted in the source paper (Study [8]), utilizing a loss function tuned via a genetic algorithm can further reduce RMSE and MAE during critical glycemic excursions.
+This indicates sufficient convergence.
 
 ---
 
-In conclusion, the developed LSTM models are ready for secondary operational validation, offering a high-accuracy foundation for both real-time clinical decision support and industrial equipment monitoring.
+Chao
