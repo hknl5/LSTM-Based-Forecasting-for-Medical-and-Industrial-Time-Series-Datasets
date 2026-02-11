@@ -191,10 +191,6 @@ Transparency regarding the boundaries of this study is essential for clinical an
 
 The AZT1D cohort is limited to 25 individuals; while granular, it lacks the scale to represent the full heterogeneity of the T1D population.
 
-### Cross-Validation Methodology
-
-Methodologically, the current evaluation lacks a **Leave-One-Subject-Out (LOSO)** cross-validation, which is the gold standard in computational medicine for ensuring that models generalize across patients rather than memorizing individual subject biases.
-
 ### Data Extraction Concerns
 
 The reliance on OCR for extracting basal rates from PDF reports introduces a potential source of noise.
@@ -205,4 +201,4 @@ Finally, the study is restricted to a single-step horizon (H=1). In real-world A
 
 ---
 
-*End of Report*
+Chao
