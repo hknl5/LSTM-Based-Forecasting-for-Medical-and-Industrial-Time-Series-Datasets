@@ -147,7 +147,7 @@ Standardized experimental configurations were maintained to ensure reproducibili
 
 Empirical results across both datasets reveal a consistent performance advantage for the LSTM over the Transformer.
 
-### AZT1D Performance (Physiological Data)
+### AZT1D Performance 
 
 **LSTM:**
 - MSE: 21.3975
@@ -159,7 +159,7 @@ Empirical results across both datasets reveal a consistent performance advantage
 - MAE: 4.0278
 - R²: 0.9804
 
-### ETTm1 Performance (Industrial Data)
+### ETTm1 Performance
 
 **LSTM:**
 - MSE: 0.1101
