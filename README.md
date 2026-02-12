@@ -1,5 +1,6 @@
 # Comparative Analysis of Deep Learning Architectures for Time-Series Forecasting: AZT1D and Electricity Transformer Datasets
 
+## 1. Introduction
 
 The strategic advancement of predictive modeling in high-stakes domains—specifically healthcare and industrial infrastructure—relies heavily on the availability and utilization of high-quality, real-world datasets. In clinical settings, longitudinal the data is the cornerstone of personalized therapy and digital twin systems, while industrial load data is essential for maintaining grid stability and preventing equipment depreciation. 
 
